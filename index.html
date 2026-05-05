@@ -38,77 +38,112 @@
       display: block;
     }
 
-    /* ── Header / Stats ── */
-    #header {
-      position: fixed; top: 0; left: 0; right: 0;
-      display: flex; align-items: center; justify-content: center;
-      gap: 3rem; padding: 0.85rem 1.5rem;
-      background: rgba(15,23,42,0.78);
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      border-bottom: 1px solid rgba(148,163,184,0.08);
+    /* ── Stats box — top right ── */
+    #stats-box {
+      position: fixed;
+      top: 1.1rem; right: 1.25rem;
       z-index: 50;
+      background: rgba(30,41,59,0.84);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(148,163,184,0.12);
+      border-radius: 14px;
+      padding: 0.85rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      min-width: 130px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
-    .stat-chip { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .stat-chip .label {
-      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted);
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
     }
-    .stat-chip .value {
-      font-size: 1.1rem; font-weight: 600; color: var(--text);
+    .stat-row .label {
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.11em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .stat-row .value {
+      font-size: 0.9rem; font-weight: 600;
+      color: var(--text);
       font-variant-numeric: tabular-nums;
     }
 
-    #btn-reset {
-      position: fixed; top: 0.62rem; right: 1.25rem; z-index: 51;
-      font: 500 0.72rem/1 'Inter', sans-serif; letter-spacing: 0.04em;
-      color: var(--muted); background: transparent;
-      border: 1px solid rgba(148,163,184,0.18); border-radius: 6px;
-      padding: 0.42rem 0.75rem; cursor: pointer;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-    #btn-reset:hover {
-      color: var(--text); border-color: rgba(148,163,184,0.4);
-      background: rgba(148,163,184,0.08);
+    #stats-divider {
+      height: 1px;
+      background: rgba(148,163,184,0.1);
+      margin: 0.1rem 0;
     }
 
-    /* ── Game Card ── */
-    #card {
-      position: relative; z-index: 20;
-      width: min(440px, calc(100vw - 2.5rem));
-      background: rgba(30,41,59,0.84);
-      backdrop-filter: blur(24px) saturate(160%);
-      -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border: 1px solid rgba(148,163,184,0.12);
-      border-radius: 22px; padding: 2.5rem;
-      text-align: center;
-      box-shadow:
-        0 4px 6px rgba(0,0,0,0.15),
-        0 20px 40px rgba(0,0,0,0.38),
-        inset 0 1px 0 rgba(255,255,255,0.04);
-      transition: border-color 0.5s ease, box-shadow 0.5s ease;
+    #btn-reset {
+      font: 500 0.68rem/1 'Inter', sans-serif;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid rgba(148,163,184,0.16);
+      border-radius: 6px;
+      padding: 0.38rem 0.6rem;
+      cursor: pointer;
+      width: 100%;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      margin-top: 0.1rem;
+    }
+    #btn-reset:hover {
+      color: var(--text);
+      border-color: rgba(148,163,184,0.4);
+      background: rgba(148,163,184,0.08);
     }
 
     /* ── UI root ── */
     #ui {
       position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
+    /* ── Game Card (self-contained click zone) ── */
+    #card {
+      position: relative; z-index: 20;
+      width: min(420px, calc(100vw - 2.5rem));
+      min-height: 300px;
+      background: rgba(30,41,59,0.84);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(148,163,184,0.12);
+      border-radius: 24px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow:
+        0 4px 6px rgba(0,0,0,0.15),
+        0 20px 40px rgba(0,0,0,0.38),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: border-color 0.5s ease, box-shadow 0.5s ease, cursor 0s;
+      user-select: none;
+    }
+
+    #card.clickable { cursor: pointer; }
+
     /* ── State panels ── */
-    .panel { display: none; }
-    .panel.active { display: block; animation: fadeUp 0.28s ease; }
+    .panel { display: none; width: 100%; }
+    .panel.active { display: flex; flex-direction: column; align-items: center; animation: fadeUp 0.28s ease; }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Idle panel ── */
+    /* ── Idle ── */
     .game-logo {
       font-family: 'Outfit', sans-serif;
-      font-size: 2.5rem; font-weight: 900;
+      font-size: 2.4rem; font-weight: 900;
       line-height: 1.0; letter-spacing: -0.025em;
       margin-bottom: 0.45rem;
       background: linear-gradient(140deg, #F1F5F9 20%, #94A3B8 100%);
@@ -151,10 +186,11 @@
 
     /* ── Hint box ── */
     .hint {
-      margin-top: 1.35rem; padding: 0.85rem 1rem;
+      margin-top: 1.25rem; padding: 0.8rem 1rem;
       background: rgba(148,163,184,0.07);
-      border-radius: 10px; font-size: 0.82rem;
+      border-radius: 10px; font-size: 0.8rem;
       color: var(--muted); line-height: 1.65;
+      width: 100%;
     }
     .hint b { font-weight: 600; }
 
@@ -165,14 +201,14 @@
       margin-bottom: 0.4rem;
     }
     .state-body {
-      font-size: 0.9rem; color: var(--muted);
-      line-height: 1.6; margin-bottom: 0;
+      font-size: 0.88rem; color: var(--muted);
+      line-height: 1.6;
     }
 
     /* ── Waiting loader ── */
     .orbit-loader {
-      width: 58px; height: 58px; margin: 0 auto 1.5rem;
-      position: relative;
+      width: 56px; height: 56px; margin-bottom: 1.4rem;
+      position: relative; flex-shrink: 0;
     }
     .orbit-loader::before, .orbit-loader::after {
       content: ''; position: absolute; border-radius: 50%;
@@ -190,8 +226,8 @@
 
     /* ── Ready beacon ── */
     .ready-beacon {
-      width: 70px; height: 70px; border-radius: 50%;
-      margin: 0 auto 1.15rem;
+      width: 68px; height: 68px; border-radius: 50%;
+      margin-bottom: 1.1rem; flex-shrink: 0;
       background: var(--ready);
       animation: beacon 0.75s ease-in-out infinite;
     }
@@ -203,24 +239,24 @@
 
     /* ── Result display ── */
     .result-label {
-      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
       text-transform: uppercase; color: var(--result);
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.15rem;
     }
     .result-number {
       font-family: 'Outfit', sans-serif;
-      font-size: clamp(3rem, 11vw, 4.5rem);
+      font-size: clamp(3rem, 12vw, 4.5rem);
       font-weight: 900; line-height: 1; color: var(--result);
       letter-spacing: -0.025em;
     }
-    .result-unit { font-size: 1.2rem; font-weight: 500; color: var(--muted); }
+    .result-unit { font-size: 1.15rem; font-weight: 500; color: var(--muted); }
 
     .rating-pill {
       display: inline-block;
-      font-size: 0.7rem; font-weight: 700;
+      font-size: 0.68rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
       padding: 0.28rem 0.85rem; border-radius: 999px;
-      margin: 0.85rem 0 1.5rem;
+      margin: 0.8rem 0 1.4rem;
     }
     .r-elite     { background: rgba(16,185,129,0.16); color: #34D399; }
     .r-excellent { background: rgba(16,185,129,0.11); color: var(--ready); }
@@ -230,46 +266,36 @@
 
     /* ── False start ── */
     .false-icon {
-      font-size: 2.6rem; line-height: 1; margin-bottom: 0.5rem;
+      font-size: 2.5rem; line-height: 1; margin-bottom: 0.5rem;
       filter: drop-shadow(0 0 14px rgba(239,68,68,0.55));
       animation: shake 0.4s ease;
     }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20%      { transform: translateX(-6px); }
-      40%      { transform: translateX(6px); }
-      60%      { transform: translateX(-4px); }
-      80%      { transform: translateX(4px); }
+      20%     { transform: translateX(-6px); }
+      40%     { transform: translateX(6px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(4px); }
     }
-    .false-gap { margin-bottom: 1.5rem; }
+    .false-gap { margin-bottom: 1.4rem; }
 
     /* ── Footer ── */
     #footer {
       position: fixed; bottom: 0.9rem;
       left: 50%; transform: translateX(-50%);
-      font-size: 0.68rem; color: rgba(148,163,184,0.32);
+      font-size: 0.67rem; color: rgba(148,163,184,0.3);
       letter-spacing: 0.07em; white-space: nowrap;
       pointer-events: none; user-select: none; z-index: 10;
     }
 
-    /* ── Keyboard hint ── */
-    #kb-hint {
-      position: fixed; bottom: 2.4rem;
-      left: 50%; transform: translateX(-50%);
-      font-size: 0.7rem; color: rgba(148,163,184,0.28);
-      letter-spacing: 0.05em; white-space: nowrap;
-      pointer-events: none; z-index: 10;
-    }
-
     /* ── Responsive ── */
     @media (max-width: 480px) {
-      #card { padding: 2rem 1.4rem; }
-      #header { gap: 1.6rem; }
-      #btn-reset { display: none; }
+      #card { padding: 2rem 1.4rem; min-height: 260px; }
+      #stats-box { min-width: 110px; padding: 0.7rem 0.85rem; }
       .game-logo { font-size: 2rem; }
     }
-    @media (max-height: 620px) {
-      #card { padding: 1.6rem; }
+    @media (max-height: 600px) {
+      #card { padding: 1.6rem; min-height: 240px; }
       .game-logo { font-size: 1.85rem; }
       .game-tagline { margin-bottom: 1.2rem; font-size: 0.82rem; }
     }
@@ -279,22 +305,25 @@
 
 <canvas id="canvas3d"></canvas>
 
-<div id="header">
-  <div class="stat-chip">
+<!-- Stats — top right -->
+<div id="stats-box">
+  <div class="stat-row">
     <span class="label">Attempts</span>
     <span class="value" id="s-att">0</span>
   </div>
-  <div class="stat-chip">
+  <div class="stat-row">
     <span class="label">Best</span>
     <span class="value" id="s-best">—</span>
   </div>
-  <div class="stat-chip">
+  <div class="stat-row">
     <span class="label">Average</span>
     <span class="value" id="s-avg">—</span>
   </div>
+  <div id="stats-divider"></div>
+  <button id="btn-reset" onclick="resetAll()">Reset</button>
 </div>
-<button id="btn-reset" onclick="resetAll()">Reset</button>
 
+<!-- Game card — self-contained click zone -->
 <div id="ui">
   <div id="card">
 
@@ -302,10 +331,10 @@
     <div class="panel active" id="p-idle">
       <div class="game-logo">Reaction<br>Timer</div>
       <p class="game-tagline">3D-powered precision timing —<br>how fast are your reflexes?</p>
-      <button class="btn btn-start" id="btn-start" onclick="beginGame()">▶&nbsp; Start Game</button>
+      <button class="btn btn-start" onclick="beginGame()">▶&nbsp; Start Game</button>
       <div class="hint">
-        Watch the 3D shape. When it turns <b style="color:var(--ready)">green</b>,
-        click anywhere as fast as you can.<br>
+        Watch the shape. When it turns <b style="color:var(--ready)">green</b>,
+        click anywhere in this box as fast as you can.<br>
         Clicking too early is a <b style="color:var(--error)">false start</b>.
       </div>
     </div>
@@ -315,7 +344,7 @@
       <div class="orbit-loader"></div>
       <div class="state-title" style="color:var(--waiting)">Get Ready…</div>
       <p class="state-body">
-        Watch the shape — wait for it to turn green.<br>
+        Watch the shape — wait for green.<br>
         <b style="color:var(--error)">Don't click yet!</b>
       </p>
     </div>
@@ -324,8 +353,8 @@
     <div class="panel" id="p-ready">
       <div class="ready-beacon"></div>
       <div class="state-title" style="color:var(--ready)">CLICK NOW!</div>
-      <p class="state-body" style="margin-top:0.3rem;font-size:0.8rem;color:rgba(148,163,184,0.6)">
-        Click anywhere · Space bar · Touch screen
+      <p class="state-body" style="font-size:0.78rem;color:rgba(148,163,184,0.55);margin-top:0.3rem">
+        Click anywhere in this box · Space bar
       </p>
     </div>
 
@@ -350,7 +379,6 @@
   </div>
 </div>
 
-<div id="kb-hint">Space or Enter also works</div>
 <div id="footer">Three.js · WebGL · Vanilla JavaScript</div>
 
 <script>
@@ -392,8 +420,8 @@ scene.add(accentB);
 /* Main torus-knot */
 const mainGeo = new THREE.TorusKnotGeometry(1.35, 0.42, 160, 18, 2, 3);
 const mainMat = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0x3B82F6),
-  emissive: new THREE.Color(0x0d1f4a),
+  color:             new THREE.Color(0x3B82F6),
+  emissive:          new THREE.Color(0x0d1f4a),
   emissiveIntensity: 0.7,
   metalness: 0.85, roughness: 0.12,
 });
@@ -407,36 +435,6 @@ const wireMat = new THREE.MeshBasicMaterial({
 });
 const wireMesh = new THREE.Mesh(wireGeo, wireMat);
 scene.add(wireMesh);
-
-/* Orbiting satellites */
-const orbitGroup = new THREE.Group();
-scene.add(orbitGroup);
-const satellites = [];
-const geoPool = [
-  () => new THREE.OctahedronGeometry(0.13 + Math.random() * 0.07),
-  () => new THREE.BoxGeometry(0.13, 0.13, 0.13),
-  () => new THREE.TetrahedronGeometry(0.14 + Math.random() * 0.06),
-];
-for (let i = 0; i < 14; i++) {
-  const t = i / 14;
-  const angle = t * Math.PI * 2;
-  const r = 3.1 + Math.sin(t * Math.PI * 5) * 0.45;
-  const mat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color(0x3B82F6),
-    emissive: new THREE.Color(0x0d1f4a),
-    emissiveIntensity: 0.45,
-    metalness: 0.9, roughness: 0.08,
-  });
-  const mesh = new THREE.Mesh(geoPool[i % 3](), mat);
-  mesh.position.set(
-    Math.cos(angle) * r,
-    Math.sin(angle * 2) * 0.65,
-    Math.sin(angle) * r * 0.5
-  );
-  mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, 0);
-  orbitGroup.add(mesh);
-  satellites.push(mesh);
-}
 
 /* Particle field */
 const pCount = 380;
@@ -456,7 +454,7 @@ const pMat = new THREE.PointsMaterial({
 });
 scene.add(new THREE.Points(pGeo, pMat));
 
-/* Color palette per game state */
+/* Color palette per state */
 const PALETTE = {
   idle:        { color: 0x3B82F6, emissive: 0x0d1f4a, light: 0x3B82F6, li: 5 },
   waiting:     { color: 0xF59E0B, emissive: 0x4d2f00, light: 0xD97706, li: 6 },
@@ -486,10 +484,10 @@ function setPalette(key) {
 const S = { IDLE: 0, WAITING: 1, READY: 2, RESULT: 3, FALSE: 4 };
 const PKEY = ['idle', 'waiting', 'ready', 'result', 'false_start'];
 
-let gState    = S.IDLE;
-let waitTimer = null;
+let gState     = S.IDLE;
+let waitTimer  = null;
 let reactStart = null;
-let session   = { n: 0, times: [] };
+let session    = { n: 0, times: [] };
 
 const panelEls = {
   [S.IDLE]:    document.getElementById('p-idle'),
@@ -508,10 +506,10 @@ const elAvg  = document.getElementById('s-avg');
 
 const CARD_STYLE = {
   idle:        { border: 'rgba(148,163,184,0.12)', glow: '' },
-  waiting:     { border: 'rgba(245,158,11,0.38)',  glow: ', 0 0 45px rgba(245,158,11,0.09)' },
-  ready:       { border: 'rgba(16,185,129,0.55)',  glow: ', 0 0 65px rgba(16,185,129,0.2)' },
-  result:      { border: 'rgba(59,130,246,0.38)',  glow: ', 0 0 45px rgba(59,130,246,0.1)' },
-  false_start: { border: 'rgba(239,68,68,0.48)',   glow: ', 0 0 45px rgba(239,68,68,0.1)' },
+  waiting:     { border: 'rgba(245,158,11,0.4)',   glow: ', 0 0 50px rgba(245,158,11,0.09)' },
+  ready:       { border: 'rgba(16,185,129,0.55)',  glow: ', 0 0 65px rgba(16,185,129,0.18)' },
+  result:      { border: 'rgba(59,130,246,0.4)',   glow: ', 0 0 50px rgba(59,130,246,0.1)' },
+  false_start: { border: 'rgba(239,68,68,0.5)',    glow: ', 0 0 50px rgba(239,68,68,0.1)' },
 };
 
 function showPanel(s) {
@@ -532,6 +530,8 @@ function go(s) {
   showPanel(s);
   setPalette(key);
   applyCardStyle(key);
+  /* Show pointer cursor only when the card is the active click target */
+  card.classList.toggle('clickable', s === S.WAITING || s === S.READY);
 }
 
 function beginGame() {
@@ -544,12 +544,11 @@ function beginGame() {
   }, delay);
 }
 
-function onInput(e) {
-  /* Capture time first for maximum accuracy */
-  const now = performance.now();
+function onCardInput(e) {
+  const now = performance.now(); /* Capture ASAP */
 
-  /* Let header controls and buttons handle themselves */
-  if (e.target && e.target.closest && e.target.closest('button, #header')) return;
+  /* Buttons handle themselves — don't double-fire */
+  if (e.target && e.target.closest && e.target.closest('button')) return;
 
   if (gState === S.WAITING) {
     clearTimeout(waitTimer);
@@ -585,7 +584,7 @@ function updateStats() {
   elAtt.textContent = n;
   if (times.length) {
     elBest.textContent = Math.round(Math.min(...times)) + ' ms';
-    elAvg.textContent  = Math.round(times.reduce((a,b)=>a+b,0)/times.length) + ' ms';
+    elAvg.textContent  = Math.round(times.reduce((a,b) => a+b, 0) / times.length) + ' ms';
   }
 }
 
@@ -598,27 +597,27 @@ function resetAll() {
   go(S.IDLE);
 }
 
-/* Input listeners */
-document.addEventListener('mousedown', onInput);
-document.addEventListener('touchstart', onInput, { passive: true });
+/* All game clicks are contained to the card */
+card.addEventListener('mousedown', onCardInput);
+card.addEventListener('touchstart', onCardInput, { passive: true });
+
+/* Keyboard: Space / Enter works globally */
 document.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'Enter') {
-    e.preventDefault();
-    if      (gState === S.IDLE)              beginGame();
-    else if (gState === S.WAITING || gState === S.READY)
-                                             onInput({ target: null });
-    else if (gState === S.RESULT || gState === S.FALSE)
-                                             beginGame();
-  }
+  if (e.code !== 'Space' && e.code !== 'Enter') return;
+  e.preventDefault();
+  if      (gState === S.IDLE)                            beginGame();
+  else if (gState === S.WAITING || gState === S.READY)   onCardInput({ target: null });
+  else if (gState === S.RESULT  || gState === S.FALSE)   beginGame();
 });
+
 window.addEventListener('contextmenu', e => e.preventDefault());
 
 /* ═══════════════════════════════════════════
-   WEB AUDIO (lazy init — requires user gesture first)
+   WEB AUDIO (lazy init on first gesture)
 ═══════════════════════════════════════════ */
 
 let audioCtx = null;
-function audio() {
+function getAudio() {
   if (!audioCtx) {
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(_) {}
   }
@@ -626,7 +625,7 @@ function audio() {
 }
 
 function tone(freq, dur, type, vol) {
-  const ctx = audio(); if (!ctx) return;
+  const ctx = getAudio(); if (!ctx) return;
   try {
     const osc  = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -662,7 +661,6 @@ function animate() {
   const dt = clock.getDelta();
   const t  = clock.getElapsedTime();
 
-  /* Rotation speed varies by state */
   const rs =
     gState === S.WAITING ? 0.6  :
     gState === S.READY   ? 2.8  :
@@ -674,7 +672,6 @@ function animate() {
   wireMesh.rotation.x -= dt * rs * 0.36;
   wireMesh.rotation.y -= dt * rs * 0.5;
 
-  /* Scale pulse by state */
   const sTarget =
     gState === S.READY   ? 1 + Math.sin(t * 12)  * 0.08 :
     gState === S.WAITING ? 1 + Math.sin(t * 3)   * 0.04 :
@@ -683,30 +680,16 @@ function animate() {
   mainMesh.scale.setScalar(smoothScale);
   wireMesh.scale.setScalar(smoothScale * 1.013);
 
-  /* Orbit group */
-  orbitGroup.rotation.y += dt * 0.3;
-  orbitGroup.rotation.x  = Math.sin(t * 0.33) * 0.14;
-  satellites.forEach((sat, i) => {
-    sat.rotation.x += dt * (0.38 + i * 0.04);
-    sat.rotation.y += dt * (0.26 + i * 0.03);
-  });
-
-  /* Color & light lerp */
   const L = 0.055;
   mainMat.color.lerp(tColor, L);
   mainMat.emissive.lerp(tEmissive, L);
   cLight.lerp(tLight, L);
   accentA.color.copy(cLight);
   accentB.color.copy(cLight);
-  accentA.intensity += (tLightInt     - accentA.intensity) * 0.07;
+  accentA.intensity += (tLightInt       - accentA.intensity) * 0.07;
   accentB.intensity += (tLightInt * 0.6 - accentB.intensity) * 0.07;
   wireMat.color.lerp(tColor, L * 0.65);
-  satellites.forEach(sat => {
-    sat.material.color.lerp(tColor, L);
-    sat.material.emissive.lerp(tEmissive, L);
-  });
 
-  /* Subtle camera drift */
   camera.position.x = Math.sin(t * 0.17) * 0.35;
   camera.position.y = Math.cos(t * 0.11) * 0.22;
   camera.lookAt(0, 0, 0);

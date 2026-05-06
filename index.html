@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="icon" href="favicon.png" type="image/png">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -184,6 +185,37 @@
     }
     .btn-retry:hover { background: rgba(239,68,68,0.22); }
 
+    /* ── Rating guide (shown in idle panel) ── */
+    .rating-guide {
+      width: 100%; margin-bottom: 1.2rem;
+      background: rgba(148,163,184,0.06);
+      border-radius: 10px; padding: 0.75rem 0.9rem;
+      display: flex; flex-direction: column; gap: 0.38rem;
+    }
+    .rg-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.79rem;
+    }
+    .rg-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .rg-label { flex: 1; color: var(--text); font-weight: 500; }
+    .rg-range { color: var(--muted); font-size: 0.73rem; font-variant-numeric: tabular-nums; }
+
+    /* ── Start cue (bottom of idle panel) ── */
+    .start-cue {
+      margin-top: 0.9rem; font-size: 0.78rem;
+      color: var(--muted); line-height: 1.65; text-align: center;
+    }
+    .start-cue b { font-weight: 600; }
+    kbd {
+      font-family: 'Inter', sans-serif; font-size: 0.68rem;
+      background: rgba(148,163,184,0.14);
+      border: 1px solid rgba(148,163,184,0.25);
+      border-radius: 4px; padding: 0.1rem 0.38rem;
+      color: var(--text);
+    }
+
     /* ── Hint box ── */
     .hint {
       margin-top: 1.25rem; padding: 0.8rem 1rem;
@@ -330,13 +362,23 @@
     <!-- IDLE -->
     <div class="panel active" id="p-idle">
       <div class="game-logo">Reaction<br>Timer</div>
-      <p class="game-tagline">3D-powered precision timing —<br>how fast are your reflexes?</p>
-      <button class="btn btn-start" onclick="beginGame()">▶&nbsp; Start Game</button>
-      <div class="hint">
-        Watch the shape. When it turns <b style="color:var(--ready)">green</b>,
-        click anywhere in this box as fast as you can.<br>
-        Clicking too early is a <b style="color:var(--error)">false start</b>.
+      <p class="game-tagline">How fast are your reflexes?</p>
+
+      <div class="rating-guide">
+        <div class="rg-row"><span class="rg-dot" style="background:#34D399"></span><span class="rg-label">Amazing</span><span class="rg-range">&lt; 200 ms</span></div>
+        <div class="rg-row"><span class="rg-dot" style="background:var(--ready)"></span><span class="rg-label">Very Good</span><span class="rg-range">200 – 250 ms</span></div>
+        <div class="rg-row"><span class="rg-dot" style="background:var(--result)"></span><span class="rg-label">Good</span><span class="rg-range">250 – 300 ms</span></div>
+        <div class="rg-row"><span class="rg-dot" style="background:var(--waiting)"></span><span class="rg-label">Average</span><span class="rg-range">300 – 400 ms</span></div>
+        <div class="rg-row"><span class="rg-dot" style="background:var(--error)"></span><span class="rg-label">Below Average</span><span class="rg-range">400 ms+</span></div>
       </div>
+
+      <button class="btn btn-start" onclick="beginGame()">&#9654;&nbsp; Start Game</button>
+
+      <p class="start-cue">
+        Click anywhere in this box or press <kbd>Space</kbd> to start.<br>
+        When the shape turns <b style="color:var(--ready)">green</b>, react fast.<br>
+        Clicking too early is a <b style="color:var(--error)">false start</b>.
+      </p>
     </div>
 
     <!-- WAITING -->
@@ -530,8 +572,8 @@ function go(s) {
   showPanel(s);
   setPalette(key);
   applyCardStyle(key);
-  /* Show pointer cursor only when the card is the active click target */
-  card.classList.toggle('clickable', s === S.WAITING || s === S.READY);
+  /* Show pointer cursor when card is a click target (idle, waiting, ready) */
+  card.classList.toggle('clickable', s === S.IDLE || s === S.WAITING || s === S.READY);
 }
 
 function beginGame() {
@@ -550,7 +592,9 @@ function onCardInput(e) {
   /* Buttons handle themselves — don't double-fire */
   if (e.target && e.target.closest && e.target.closest('button')) return;
 
-  if (gState === S.WAITING) {
+  if (gState === S.IDLE) {
+    beginGame();
+  } else if (gState === S.WAITING) {
     clearTimeout(waitTimer);
     playFalse();
     go(S.FALSE);
@@ -569,9 +613,9 @@ function renderResult(ms) {
   elMs.textContent = Math.round(ms);
   let label, cls;
   if      (ms < 150) { label = 'Superhuman ⚡'; cls = 'r-elite'; }
-  else if (ms < 200) { label = 'Elite';          cls = 'r-elite'; }
-  else if (ms < 250) { label = 'Excellent';      cls = 'r-excellent'; }
-  else if (ms < 300) { label = 'Great';          cls = 'r-great'; }
+  else if (ms < 200) { label = 'Amazing';        cls = 'r-elite'; }
+  else if (ms < 250) { label = 'Very Good';      cls = 'r-excellent'; }
+  else if (ms < 300) { label = 'Good';           cls = 'r-great'; }
   else if (ms < 400) { label = 'Average';        cls = 'r-average'; }
   else if (ms < 600) { label = 'Below Average';  cls = 'r-average'; }
   else               { label = 'Keep Practicing'; cls = 'r-slow'; }

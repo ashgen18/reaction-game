@@ -52,12 +52,27 @@
       overflow: hidden;
     }
 
-    /* ── Instructions block (shown only in IDLE) ── */
+    /* ── Instructions overlay (fixed modal over the play area) ── */
     #instructions {
-      width: min(580px, calc(100vw - 2rem));
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 50;
+      width: min(600px, calc(100vw - 2rem));
+      background: rgba(12, 20, 38, 0.95);
+      backdrop-filter: blur(28px) saturate(170%);
+      -webkit-backdrop-filter: blur(28px) saturate(170%);
+      border: 1px solid rgba(148,163,184,0.14);
+      border-radius: 20px;
+      padding: 1.6rem 2rem;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.6);
       text-align: center;
     }
     #instructions.hidden { display: none; }
+
+    /* Start Game button row inside the overlay */
+    .overlay-actions { margin-top: 1rem; }
+    .overlay-actions .btn { max-width: 220px; width: 100%; }
 
     .game-logo {
       font-family: 'Outfit', sans-serif;
@@ -128,6 +143,7 @@
 
     /* ── Game zone: the clickable area ── */
     #game-zone {
+      position: relative;
       min-height: 140px;
       display: flex; align-items: center; justify-content: center;
       padding: 1.5rem;
@@ -213,6 +229,27 @@
     .r-average   { background: rgba(245,158,11,0.16); color: var(--waiting); }
     .r-slow      { background: rgba(239,68,68,0.16);  color: var(--error); }
 
+    /* RESULT: compact absolute popup inside game-zone */
+    #p-result.active {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 24, 44, 0.93);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(59,130,246,0.22);
+      border-radius: 14px;
+      padding: 0.6rem 1.2rem;
+      z-index: 5;
+      animation: scaleIn 0.22s ease;
+      width: max-content; max-width: calc(100% - 2rem);
+    }
+    #p-result .result-number { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+      to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
     /* FALSE: icon only in game-zone */
     .false-icon {
       font-size: 2rem; line-height: 1;
@@ -259,7 +296,7 @@
     }
 
     /* Footer buttons */
-    .footer-btns { display: flex; gap: 0.5rem; width: 100%; }
+    .footer-btns { display: flex; gap: 0.5rem; width: 100%; justify-content: center; }
     .btn {
       font-family: 'Outfit', sans-serif; font-size: 0.88rem;
       font-weight: 700; flex: 1;
@@ -281,6 +318,7 @@
     .btn-again {
       background: rgba(59,130,246,0.14); color: var(--result);
       border: 1px solid rgba(59,130,246,0.25);
+      flex: 1;
     }
     .btn-again:hover { background: rgba(59,130,246,0.24); }
 
@@ -297,7 +335,7 @@
 
     /* Stack info panel to single column on mobile */
     @media (max-width: 540px) {
-      #instructions { width: min(400px, calc(100vw - 2rem)); }
+      #instructions { width: calc(100vw - 2rem); padding: 1.2rem 1.2rem; }
       .info-panel { grid-template-columns: 1fr; gap: 0.85rem; padding: 0.85rem 1rem; }
     }
 
@@ -381,6 +419,10 @@
         </div>
       </div>
     </div>
+
+    <div class="overlay-actions">
+      <button class="btn btn-primary" id="btn-start" onclick="beginGame()">&#9654;&nbsp; Start Game</button>
+    </div>
   </div>
 
   <!-- Game card -->
@@ -445,9 +487,8 @@
 
       <!-- Buttons -->
       <div class="footer-btns">
-        <button class="btn btn-primary" id="btn-start"  onclick="beginGame()">&#9654;&nbsp; Start Game</button>
-        <button class="btn btn-again   hidden" id="btn-again"  onclick="beginGame()">Play Again</button>
-        <button class="btn btn-ghost"  id="btn-reset"  onclick="resetAll()">Reset</button>
+        <button class="btn btn-again hidden" id="btn-again" onclick="beginGame()">Play Again</button>
+        <button class="btn btn-ghost" id="btn-reset" onclick="resetAll()">Reset</button>
       </div>
 
     </div><!-- /#card-footer -->
@@ -560,7 +601,6 @@ const gameZone    = document.getElementById('game-zone');
 const card        = document.getElementById('card');
 const instructions = document.getElementById('instructions');
 const falseNotice  = document.getElementById('false-notice');
-const btnStart     = document.getElementById('btn-start');
 const btnAgain     = document.getElementById('btn-again');
 const elMs  = document.getElementById('r-ms');
 const elRate = document.getElementById('r-rating');
@@ -601,8 +641,6 @@ function go(s) {
   /* False notice only in FALSE state */
   falseNotice.classList.toggle('hidden', s !== S.FALSE);
 
-  /* Primary action button */
-  btnStart.classList.toggle('hidden', s !== S.IDLE);
   btnAgain.classList.toggle('hidden', s !== S.RESULT && s !== S.FALSE);
 
   /* Pointer cursor when zone accepts clicks */

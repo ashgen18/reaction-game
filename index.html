@@ -14,6 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="src/storage/highscores.js"></script>
+  <script src="src/game/scoring.js"></script>
 </head>
 <body>
 
@@ -85,6 +87,7 @@
           <span id="r-ms">—</span><span class="result-unit"> ms</span>
         </div>
         <span class="rating-pill" id="r-rating"></span>
+        <span class="new-pb hidden" id="r-pb">🏆 New Record!</span>
       </div>
 
       <!-- FALSE: icon only, message shown in footer -->
@@ -107,12 +110,12 @@
           <span class="val" id="s-att">0</span>
         </div>
         <div class="stat-chip">
-          <span class="lbl">Best</span>
+          <span class="lbl">Session Best</span>
           <span class="val" id="s-best">—</span>
         </div>
         <div class="stat-chip">
-          <span class="lbl">Average</span>
-          <span class="val" id="s-avg">—</span>
+          <span class="lbl">All-time</span>
+          <span class="val val-gold" id="s-alltime">—</span>
         </div>
       </div>
 
@@ -120,6 +123,7 @@
       <div class="footer-btns">
         <button class="btn btn-again hidden" id="btn-again" onclick="beginGame()">Play Again</button>
         <button class="btn btn-ghost" id="btn-reset" onclick="resetAll()">Reset</button>
+        <button class="btn btn-ghost btn-icon" onclick="openScores()" title="Records">🏆</button>
       </div>
 
     </div><!-- /#card-footer -->
@@ -127,6 +131,31 @@
   </div><!-- /#card -->
 
 </div><!-- /#ui -->
+
+<!-- Records modal -->
+<div id="scores-modal" class="modal-overlay hidden">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h2 class="modal-title">Records</h2>
+      <button class="modal-close" onclick="closeScores()">✕</button>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Top Scores</h3>
+      <div id="scores-list"></div>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Achievements</h3>
+      <div id="achievements-grid" class="achievements-grid"></div>
+    </div>
+
+    <button class="btn btn-ghost btn-danger" onclick="clearRecords()">Clear All Records</button>
+  </div>
+</div>
+
+<!-- Achievement toasts -->
+<div id="toast-container"></div>
 
 <script src="script.js"></script>
 </body>

@@ -102,11 +102,12 @@ const card        = document.getElementById('card');
 const instructions = document.getElementById('instructions');
 const falseNotice  = document.getElementById('false-notice');
 const btnAgain     = document.getElementById('btn-again');
-const elMs  = document.getElementById('r-ms');
-const elRate = document.getElementById('r-rating');
-const elAtt  = document.getElementById('s-att');
-const elBest = document.getElementById('s-best');
-const elAvg  = document.getElementById('s-avg');
+const elMs      = document.getElementById('r-ms');
+const elRate    = document.getElementById('r-rating');
+const elPb      = document.getElementById('r-pb');
+const elAtt     = document.getElementById('s-att');
+const elBest    = document.getElementById('s-best');
+const elAlltime = document.getElementById('s-alltime');
 
 const CARD_STYLE = {
   idle:        { border: 'rgba(148,163,184,0.12)', glow: '' },
@@ -170,20 +171,19 @@ function onGameClick(e) {
     updateStats();
     renderResult(elapsed);
     playResult(elapsed);
+
+    const { newlyUnlocked, isNewBest } = HighScores.addScore(elapsed);
+    updateAllTimeBest();
+    elPb.classList.toggle('hidden', !isNewBest);
+    newlyUnlocked.forEach(showAchievementToast);
+
     go(S.RESULT);
   }
 }
 
 function renderResult(ms) {
-  elMs.textContent = Math.round(ms);
-  let label, cls;
-  if      (ms < 150) { label = 'Superhuman ⚡'; cls = 'r-elite'; }
-  else if (ms < 200) { label = 'Amazing';        cls = 'r-elite'; }
-  else if (ms < 250) { label = 'Very Good';      cls = 'r-excellent'; }
-  else if (ms < 300) { label = 'Good';           cls = 'r-great'; }
-  else if (ms < 400) { label = 'Average';        cls = 'r-average'; }
-  else if (ms < 600) { label = 'Below Average';  cls = 'r-average'; }
-  else               { label = 'Keep Practicing'; cls = 'r-slow'; }
+  const { label, cls } = getRating(ms);
+  elMs.textContent   = Math.round(ms);
   elRate.textContent = label;
   elRate.className   = 'rating-pill ' + cls;
 }
@@ -193,15 +193,83 @@ function updateStats() {
   elAtt.textContent = n;
   if (times.length) {
     elBest.textContent = Math.round(Math.min(...times)) + ' ms';
-    elAvg.textContent  = Math.round(times.reduce((a,b) => a+b, 0) / times.length) + ' ms';
   }
+}
+
+function updateAllTimeBest() {
+  const pb = HighScores.getPersonalBest();
+  elAlltime.textContent = pb !== null ? pb + ' ms' : '—';
 }
 
 function resetAll() {
   clearTimeout(waitTimer);
   session = { n: 0, times: [] };
-  elAtt.textContent = '0'; elBest.textContent = '—'; elAvg.textContent = '—';
+  elAtt.textContent = '0'; elBest.textContent = '—';
   go(S.IDLE);
+}
+
+/* ═══════════════════════════════════════════
+   RECORDS MODAL
+═══════════════════════════════════════════ */
+
+function openScores() {
+  const modal = document.getElementById('scores-modal');
+
+  /* Scores */
+  const scores = HighScores.getTopScores();
+  const list   = document.getElementById('scores-list');
+  if (scores.length === 0) {
+    list.innerHTML = '<p class="scores-empty">No scores yet — play a round!</p>';
+  } else {
+    const rankClass = ['gold', 'silver', 'bronze'];
+    list.innerHTML = scores.map((s, i) => `
+      <div class="score-row">
+        <span class="score-rank ${rankClass[i] || ''}">${i + 1}</span>
+        <span class="score-ms">${s.ms} ms</span>
+        <span class="score-date">${new Date(s.ts).toLocaleDateString()}</span>
+      </div>`).join('');
+  }
+
+  /* Achievements */
+  const unlocked = new Set(HighScores.getUnlocked().map(a => a.id));
+  document.getElementById('achievements-grid').innerHTML =
+    HighScores.ACHIEVEMENTS.map(a => `
+      <div class="ach-chip ${unlocked.has(a.id) ? 'unlocked' : 'locked'}">
+        <span class="ach-icon">${a.icon}</span>
+        <span class="ach-label">${a.label}</span>
+        <span class="ach-desc">${a.desc}</span>
+      </div>`).join('');
+
+  modal.classList.remove('hidden');
+}
+
+function closeScores() {
+  document.getElementById('scores-modal').classList.add('hidden');
+}
+
+function clearRecords() {
+  if (!confirm('Clear all scores and achievements? This cannot be undone.')) return;
+  HighScores.reset();
+  updateAllTimeBest();
+  closeScores();
+}
+
+/* ═══════════════════════════════════════════
+   ACHIEVEMENT TOASTS
+═══════════════════════════════════════════ */
+
+function showAchievementToast(ach) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `
+    <span class="toast-icon">${ach.icon}</span>
+    <div class="toast-body">
+      <span class="toast-title">Achievement Unlocked — ${ach.label}</span>
+      <span class="toast-desc">${ach.desc}</span>
+    </div>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
 }
 
 /* Game clicks confined to the game zone */
@@ -221,6 +289,7 @@ window.addEventListener('contextmenu', e => e.preventDefault());
 
 /* Initialise UI state */
 go(S.IDLE);
+updateAllTimeBest();
 
 /* ═══════════════════════════════════════════
    WEB AUDIO
